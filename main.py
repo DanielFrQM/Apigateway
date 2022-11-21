@@ -1,5 +1,3 @@
-import re
-
 from flask import Flask
 from flask import jsonify
 from flask import request
@@ -52,12 +50,13 @@ def before_request_callback():
             permiso = validarPermiso(endpoint, request.method, usuario['rol']['_id'])
             if not permiso:
                 return jsonify({"mensaje: ":"No tiene permisos para ejecutar esta accion"}),401
-            else:
-                return jsonify({"mensaje: ":"Se puede ejecutar la accion"}),200
+        else:
+            return jsonify({"mensaje: ":"No tiene permisos para ejecutar esta accion"}),401
 
 def validarPermiso(endpoint, metodo, id_rol):
-    url = data['url-ms-seguridad']+'validar-permiso/rol/'+id_rol
+    url = data['url-ms-seguridad']+'/permisos-rol/validar-permiso/rol/'+id_rol
     tienePermiso = False
+    print(url)
     headers = {"content-Type":"application/json; charset = utf-8"}
     body = {
         "url": endpoint,
@@ -67,193 +66,193 @@ def validarPermiso(endpoint, metodo, id_rol):
     try:
         datos = respuesta.json()
         if("_id" in datos):
-            tienePermiso
+            tienePermiso = True
     except:
         pass
     return  tienePermiso
 
 def limpiarUrl(url): #127.0.0.1:8080/permisos-rol/sdfsdfsdf/rol/sdfsdf/permiso/sdfsdf
-    partesUrl = url.split('/') #127.0.0.1:8080/estudiantes/5a5sd5 -> ['127.0.0.1:8080','estudiantes','5a5sd5']
+    partesUrl = url.split('/') #127.0.0.1:8080/candidatos/5a5sd5 -> ['127.0.0.1:8080','candidatos','5a5sd5']
     for parte in partesUrl:
         if re.search('\\d', parte): #\\d -> expresion regular -> contiene string alfanumerico
            url = url.replace(parte,'?')
     return url
 
-@app.route("/estudiantes", methods = ['POST'])
-def crearEstudiante():
-    datosEstudiante = request.get_json()
+@app.route("/candidatos", methods = ['POST'])
+def crearcandidato():
+    datoscandidato = request.get_json()
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"]+'/estudiantes'
-    respuesta = request.post(url, json = datosEstudiante, headers= headers)
+    url = data["url-ms-registraduria"]+'/candidatos'
+    respuesta = request.post(url, json = datoscandidato, headers= headers)
     return jsonify(respuesta.json())
 
-@app.route("/estudiantes/<string:id>", methods = ['GET'])
-def ObtenerEstudiante(id):
+@app.route("/candidatos/<string:id>", methods = ['GET'])
+def Obtenercandidato(id):
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"]+'/estudiantes/'+id
+    url = data["url-ms-registraduria"]+'/candidatos/'+id
     respuesta = requests.get(url, headers= headers)
     return jsonify(respuesta.json())
 
-@app.route("/estudiantes", methods = ['GET'])
-def ObtenerEstudiantes():
+@app.route("/candidatos", methods = ['GET'])
+def Obtenercandidatos():
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"]+'/estudiantes'
+    url = data["url-ms-registraduria"]+'/candidatos'
     respuesta = requests.get(url, headers= headers)
     return jsonify(respuesta.json())
 
-@app.route("/estudiantes/<string:id>", methods = ['PUT'])
-def actualizarEstudiante(id):
-    datosEstudiante= request.get_json()
+@app.route("/candidatos/<string:id>", methods = ['PUT'])
+def actualizarcandidato(id):
+    datoscandidato= request.get_json()
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"]+'/estudiantes/'+id
-    respuesta = requests.put(url,json = datosEstudiante, headers=headers)
+    url = data["url-ms-registraduria"]+'/candidatos/'+id
+    respuesta = requests.put(url,json = datoscandidato, headers=headers)
     return jsonify(respuesta.json())
 
-@app.route("/estudiantes/<string:id>", methods = ['DELETE'])
-def eliminarEstudiante(id):
+@app.route("/candidatos/<string:id>", methods = ['DELETE'])
+def eliminarcandidato(id):
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"] + '/estudiantes'
+    url = data["url-ms-registraduria"] + '/candidatos'
     respuesta = requests.delete(url, headers=headers)
     return jsonify(respuesta.json())
 
 #--------------------------------------------------------------
-@app.route("/departamentos",methods=['POST'])
-def crearDepartamento():
-    datosDepartamento = request.get_json()
+@app.route("/partidos",methods=['POST'])
+def crearpartido():
+    datospartido = request.get_json()
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"] + '/departamentos'
-    respuesta = requests.post(url, json=datosDepartamento, headers=headers)
+    url = data["url-ms-registraduria"] + '/partidos'
+    respuesta = requests.post(url, json=datospartido, headers=headers)
     return jsonify(respuesta.json())
 ###################
-@app.route("/departamentos",methods=['GET'])
-def mostrarDepartamentos():
+@app.route("/partidos",methods=['GET'])
+def mostrarpartidos():
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"] + '/departamentos'
+    url = data["url-ms-registraduria"] + '/partidos'
     respuesta = requests.get(url, headers=headers)
     return jsonify(respuesta.json())
 ################
-@app.route("/departamentos/<string:id>",methods=['GET'])
-def mostrarDepartamento(id):
+@app.route("/partidos/<string:id>",methods=['GET'])
+def mostrarpartido(id):
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"] + '/departamentos/'+id
+    url = data["url-ms-registraduria"] + '/partidos/'+id
     respuesta = requests.get(url, headers=headers)
     return jsonify(respuesta.json())
 ##########################
-@app.route("/departamentos/<string:id>", methods=['PUT'])
-def actualizarDepartamento(id):
-    datosDepartamento = request.get_json()
+@app.route("/partidos/<string:id>", methods=['PUT'])
+def actualizarpartido(id):
+    datospartido = request.get_json()
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"] + '/departamentos/' + id
-    respuesta = requests.put(url, json= datosDepartamento, headers=headers)
+    url = data["url-ms-registraduria"] + '/partidos/' + id
+    respuesta = requests.put(url, json= datospartido, headers=headers)
     return jsonify(respuesta.json())
 ########################
-@app.route("/departamentos/<string:id>", methods=['DELETE'])
-def eliminarDepartamento(id):
+@app.route("/partidos/<string:id>", methods=['DELETE'])
+def eliminarpartido(id):
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"] + '/departamentos/' + id
+    url = data["url-ms-registraduria"] + '/partidos/' + id
     respuesta = requests.delete(url, headers=headers)
     return jsonify(respuesta.json())
 #--------------------------------------------------------------
-@app.route("/materias",methods=['POST'])
-def crearMateria():
-    datosMateria = request.get_json()
+@app.route("/mesas",methods=['POST'])
+def crearmesa():
+    datosmesa = request.get_json()
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"] + '/materias'
-    respuesta = requests.post(url, json=datosMateria, headers=headers)
+    url = data["url-ms-registraduria"] + '/mesas'
+    respuesta = requests.post(url, json=datosmesa, headers=headers)
     return jsonify(respuesta.json())
 ########################
-@app.route("/materias",methods=['GET'])
-def mostrarMaterias():
+@app.route("/mesas",methods=['GET'])
+def mostrarmesas():
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"] + '/materias'
+    url = data["url-ms-registraduria"] + '/mesas'
     respuesta = requests.get(url, headers=headers)
     return jsonify(respuesta.json())
 ###################
-@app.route("/materias/<string:id>",methods=['GET'])
-def mostrarMateria(id):
+@app.route("/mesas/<string:id>",methods=['GET'])
+def mostrarmesa(id):
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"] + '/materias/'+id
+    url = data["url-ms-registraduria"] + '/mesas/'+id
     respuesta = requests.get(url, headers=headers)
     return jsonify(respuesta.json())
 ####################
-@app.route("/materias/<string:id>",methods=['PUT'])
-def actualizarMateria(id):
-    datosMateria = request.get_json()
+@app.route("/mesas/<string:id>",methods=['PUT'])
+def actualizarmesa(id):
+    datosmesa = request.get_json()
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"] + '/materias/' + id
-    respuesta = requests.put(url, json= datosMateria, headers=headers)
+    url = data["url-ms-registraduria"] + '/mesas/' + id
+    respuesta = requests.put(url, json= datosmesa, headers=headers)
     return jsonify(respuesta.json())
 #####################
-@app.route("/materias/<string:id>",methods=['DELETE'])
-def eliminarMateria(id):
+@app.route("/mesas/<string:id>",methods=['DELETE'])
+def eliminarmesa(id):
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"] + '/materias/' + id
+    url = data["url-ms-registraduria"] + '/mesas/' + id
     respuesta = requests.delete(url, headers=headers)
     return jsonify(respuesta.json())
 ###############
-@app.route("/materias/<string:id>/departamento/<string:id_departamento>",methods=['PUT'])
-def asignarMateria(id, id_departamento):
+@app.route("/candidatos/<string:id>/partido/<string:id_partido>",methods=['PUT'])
+def asignacandidatos(id, id_partido):
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"] + '/materias/' + id+'/departamento/'+id_departamento
+    url = data["url-ms-registraduria"] + '/candidatos/' + id+'/partido/'+id_partido
     respuesta = requests.put(url, headers=headers)
     return jsonify(respuesta.json())
 #--------------------------------------------------------------
-@app.route("/inscripciones/estudiante/<string:id_estudiante>/materia/<string:id_materia>",methods=['POST'])
-def crearInscripcion(id_estudiante, id_materia):
+@app.route("/resultados/candidato/<string:id_candidato>/mesa/<string:id_mesa>",methods=['POST'])
+def crearInscripcion(id_candidato, id_mesa):
     datosInscripcion = request.get_json()
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"] + '/inscripciones/estudiante/'+id_estudiante+'/materia/'+id_materia
+    url = data["url-ms-registraduria"] + '/resultados/candidato/'+id_candidato+'/mesa/'+id_mesa
     respuesta = requests.post(url, json=datosInscripcion, headers=headers)
     return jsonify(respuesta.json())
 #########################3
-@app.route("/inscripciones",methods=['GET'])
-def mostrarInscripciones():
+@app.route("/resultados",methods=['GET'])
+def mostrarresultados():
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"] + '/inscripciones'
+    url = data["url-ms-registraduria"] + '/resultados'
     respuesta = requests.get(url, headers=headers)
     return jsonify(respuesta.json())
 
 #######################
-@app.route("/inscripciones/<string:id>",methods = ['GET'])
+@app.route("/resultados/<string:id>",methods = ['GET'])
 def mostrarInscripcion(id):
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"] + '/inscripciones/'+id
+    url = data["url-ms-registraduria"] + '/resultados/'+id
     respuesta = requests.get(url, headers=headers)
     return jsonify(respuesta.json())
 #########################
-@app.route("/inscripciones/<string:id>/estudiante/<string:id_estudiante>/materia/<string:id_materia>",methods = ['PUT'])
-def actualizarInscripcion(id,id_estudiante,id_materia):
+@app.route("/resultados/<string:id>/candidato/<string:id_candidato>/mesa/<string:id_mesa>",methods = ['PUT'])
+def actualizarInscripcion(id,id_candidato,id_mesa):
     datosInscripcion = request.get_json()
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"] + '/inscripciones/'+id+'/estudiante/'+id_estudiante+'/materia/'+id_materia
+    url = data["url-ms-registraduria"] + '/resultados/'+id+'/candidato/'+id_candidato+'/mesa/'+id_mesa
     respuesta = requests.put(url, json=datosInscripcion, headers=headers)
     return jsonify(respuesta.json())
 ##########################
-@app.route("/inscripciones/<string:id>",methods =['DELETE'])
+@app.route("/resultados/<string:id>",methods =['DELETE'])
 def eliminarInscripcion(id):
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"] + '/inscripciones/' + id
+    url = data["url-ms-registraduria"] + '/resultados/' + id
     respuesta = requests.delete(url, headers=headers)
     return jsonify(respuesta.json())
 ##########################
-@app.route("/inscripciones/materia/<string:id_materia>", methods =['GET'])
-def inscritosMateria(id_materia):
+@app.route("/resultados/mesa/<string:id_mesa>", methods =['GET'])
+def inscritosmesa(id_mesa):
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"] + '/inscripciones/materia/'+id_materia
+    url = data["url-ms-registraduria"] + '/resultados/mesa/'+id_mesa
     respuesta = requests.get(url, headers=headers)
     return jsonify(respuesta.json())
 ##########################33
-@app.route("/inscripciones/notas_mayores", methods =['GET'])
+@app.route("/resultados/notas_mayores", methods =['GET'])
 def notasMayores():
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"] + '/inscripciones/nota_mayores'
+    url = data["url-ms-registraduria"] + '/resultados/nota_mayores'
     respuesta = requests.get(url, headers=headers)
     return jsonify(respuesta.json())
 ###########################
-@app.route("/inscripciones/promedio/materia/<string:id_materia>", methods = ['GET'])
-def promedioMateria(id_materia):
+@app.route("/resultados/promedio/mesa/<string:id_mesa>", methods = ['GET'])
+def promediomesa(id_mesa):
     headers = {"Content-Type": "application/json; charset = utf-8"}
-    url = data["url-ms-academico"] + '/inscripciones/promedio/materia/'+id_materia
+    url = data["url-ms-registraduria"] + '/resultados/promedio/mesa/'+id_mesa
     respuesta = requests.get(url, headers=headers)
     return jsonify(respuesta.json())
 #--------------------------------------------------------------
