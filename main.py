@@ -83,7 +83,7 @@ def crearcandidato():
     datoscandidato = request.get_json()
     headers = {"Content-Type": "application/json; charset = utf-8"}
     url = data["url-ms-registraduria"]+'/candidatos'
-    respuesta = request.post(url, json = datoscandidato, headers= headers)
+    respuesta = requests.post(url, json = datoscandidato, headers= headers)
     return jsonify(respuesta.json())
 
 @app.route("/candidatos/<string:id>", methods = ['GET'])
